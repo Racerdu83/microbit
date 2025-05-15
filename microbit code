@@ -2,6 +2,19 @@ from microbit import *
 import radio
 import utime
 
+def radio_sendValue(name, value):
+  type = ""
+  if isinstance(value, int):
+    type = "int:"
+  elif isinstance(value, float):
+    type = "float:"
+  elif isinstance(value, bool):
+    value = int(value)
+    type = "bool:"
+  elif isinstance(value, list):
+    type = "list:"
+  radio.send("&&&" + type + "[" + name + ";" + str(value) + "]&&&")
+
 radio.on()
 
 radio.config(channel = 7, power = 6, length = 32, group=42)
@@ -9,18 +22,18 @@ radio.config(channel = 7, power = 6, length = 32, group=42)
 while True:
   Temperature = 0
   Temperature = temperature()
-  utime.sleep(1)
+  utime.sleep(2)
   if temperature() <= 28:
     display.scroll(str(Temperature), delay=150, wait=True)
     display.show(Image.SAD)
-    utime.sleep(1)
-    radio.send(('{}' * 3).format("12. je suis malade ! J'ai ", temperature(), 'degrées'))
+    radio_sendValue("12. je suis malade ! J'ai ", str(temperature()) + 'degrées')
+    utime.sleep(3)
   else:
     if temperature() > 38:
       display.scroll(str(Temperature), delay=150, wait=True)
       display.show(Image.SAD)
-      utime.sleep(1)
-      radio.send(('{}' * 3).format("12. je suis malade ! J'ai ", temperature(), 'degrées'))
+      radio_sendValue("12. je suis malade ! J'ai ", str(temperature()) + 'degrées')
+      utime.sleep(3)
     else:
       display.scroll(str(Temperature), delay=150, wait=True)
       display.show(Image.HAPPY)
